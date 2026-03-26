@@ -1,127 +1,25 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>경지사 2차 고득점 마스터</title>
-    <style>
-        :root { --main: #1e3a8a; --sub: #3b82f6; --bg: #f1f5f9; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); padding: 15px; line-height: 1.5; color: #334155; }
-        .hierarchy { font-size: 0.85rem; color: var(--sub); font-weight: 600; margin-bottom: 5px; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 5px solid var(--main); }
-        .question-title { font-size: 1.25rem; font-weight: 800; color: #1e293b; margin-bottom: 20px; word-break: keep-all; }
-        .score-badge { display: inline-block; background: #fee2e2; color: #ef4444; font-size: 0.75rem; padding: 2px 8px; border-radius: 5px; margin-bottom: 10px; }
-        textarea { width: 100%; height: 120px; margin-bottom: 15px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 1rem; box-sizing: border-box; }
-        .btn { width: 100%; padding: 18px; background: var(--main); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
-        .ans-section { display: none; margin-top: 25px; animation: fadeIn 0.5s; }
-        .keyword-box { background: #eff6ff; padding: 15px; border-radius: 12px; margin-top: 10px; }
-        .tag { display: inline-block; background: var(--main); color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; margin: 3px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="hierarchy" id="disp-hierarchy">인적자원관리 > ...</div>
-        <div class="score-badge">논술형 (30점)</div>
-        <div class="question-title" id="disp-q">문제를 불러오는 중...</div>
-        
-        <p>📝 <strong>답안 목차 구성 (I, II, III...)</strong></p>
-        <textarea id="in-struct" placeholder="전체 흐름을 고려하여 목차를 잡아보세요."></textarea>
-        
-        <p>🔑 <strong>핵심 키워드 & 학자명</strong></p>
-        <textarea id="in-key" placeholder="채점 포인트가 될 키워드를 나열하세요."></textarea>
-        
-        <button class="btn" onclick="showResult()">정답 및 피드백 확인</button>
-        
-        <div id="ans-area" class="ans-section">
-            <div style="font-weight: bold; color: var(--main);">📍 표준 목차 구조</div>
-            <div id="std-struct" style="white-space: pre-wrap; background: #fff; padding: 15px; border: 1px solid #e2e8f0; border-radius: 10px; margin: 10px 0;"></div>
-            
-            <div style="font-weight: bold; color: var(--main);">📍 필수 핵심 키워드</div>
-            <div id="std-key" class="keyword-box"></div>
-            
-            <button class="btn" style="background:#64748b; margin-top:20px;" onclick="location.reload()">다음 문제 도전</button>
-        </div>
-    </div>
+<style>
+    /* 목차 가독성을 위해 간격 조정 */
+    #std-struct { 
+        line-height: 1.8; 
+        font-size: 0.95rem; 
+        border-left: 4px solid var(--main); 
+        padding-left: 20px !important;
+    }
+    /* 키워드가 많아질 것에 대비해 정렬 개선 */
+    .keyword-box { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { background: #f8fafc; color: #1e3a8a; border: 1px solid #1e3a8a; font-weight: 500; }
+</style>
 
-    <script>
-        // 이 데이터는 제미나이가 전공 서적을 분석하여 채워줄 것입니다.
-        const quizData = [
-  // --- 조직행동론 (조직/집단/개인) ---
-  {
-    h: "조직행동론 > 조직차원 > 조직구조론",
-    q: "민츠버그(H. Mintzberg)가 제시한 조직의 5가지 구성요소와 이를 바탕으로 한 5가지 조직 설계 유형을 설명하고, 현대 유기적 조직으로의 이행 필요성을 논하시오. (30점)",
-    struct: "I. 조직 설계의 의의\nII. 조직의 5가지 기본 구성요소 (전략부문, 중간관리, 운영부문, 기술구조, 지원스태프)\nIII. 5가지 조직 설계 유형 (단순구조, 기계적 관료제, 전문적 관료제, 사업부제, 애드호크라시)\nIV. 환경 변화에 따른 유기적 조직(애드호크라시)의 중요성\nV. 결론 및 시사점",
-    keys: ["민츠버그", "전략부문", "기술구조", "애드호크라시", "상황적합이론", "유기적 구조", "상호조절"]
-  },
-  {
-    h: "조직행동론 > 집단차원 > 리더십론",
-    q: "리더십 특성이론, 행위이론, 상황이론의 발전 과정을 비교 설명하고, 현대적 리더십인 변혁적 리더십(Transformational Leadership)의 핵심 구성요소를 논하시오. (30점)",
-    struct: "I. 리더십 이론의 변천 개요\nII. 전통적 리더십 이론 (특성, 행위, 상황이론-Fiedler 등)\nIII. 거래적 리더십과 변혁적 리더십의 비교\nIV. 변혁적 리더십의 4요소 (카리스마, 영감적 동기부여, 지적 자극, 개별적 배려)\nV. 한국 기업 조직에의 적용 방안",
-    keys: ["피들러(Fiedler)", "변혁적 리더십", "베이스(Bass)", "카리스마", "개별적 배려", "영감적 동기부여", "지적 자극"]
-  },
-  {
-    h: "조직행동론 > 개인차원 > 동기부여론",
-    q: "내용이론과 과정이론의 차이점을 기술하고, 브룸(Vroom)의 기대이론과 아담스(Adams)의 공정성이론을 바탕으로 조직 구성원의 동기부여 전략을 논하시오. (30점)",
-    struct: "I. 동기부여의 개념 및 중요성\nII. 브룸의 기대이론 (V-I-E 모형)\nIII. 아담스의 공정성이론 (투입 대 결과의 비율, 준거인물)\nIV. 두 이론의 통합을 통한 실무적 동기부여 방안\nV. 결론",
-    keys: ["브룸(Vroom)", "기대감(Expectancy)", "수단성(Instrumentality)", "유의성(Valence)", "아담스(Adams)", "분배적 공정성", "준거인물"]
-  },
-  {
-    h: "조직행동론 > 조직차원 > 조직문화론",
-    q: "샤인(E. Schein)의 조직문화 3수준 모델을 설명하고, 강한 조직문화의 장단점과 조직 변화 상황에서의 문화 관리 전략에 대해 논하시오. (30점)",
-    struct: "I. 조직문화의 정의\nII. 샤인의 3수준 (인공물, 신봉하는 가치, 근본적 가정)\nIII. 강한 조직문화의 순기능과 역기능 (응집력 vs 경직성)\nIV. 조직 변화와 문화적 적응(Cultural Adaptation)\nV. 경영자의 역할과 시사점",
-    keys: ["에드가 샤인", "근본적 가정", "인공물", "조직 사회화", "문화적 적응", "핵심가치", "변화관리"]
-  },
-  {
-    h: "조직행동론 > 개인차원 > 태도 및 가치관",
-    q: "조직몰입(Organizational Commitment)의 3가지 유형을 설명하고, 직무만족이 조직 시민 행동(OCB) 및 이직 의도에 미치는 영향력을 논하시오. (30점)",
-    struct: "I. 조직태도의 중요성\nII. 메이어와 앨런의 조직몰입 3요소 (정서적, 유지적, 규범적 몰입)\nIII. 직무만족의 결정요인과 효과\nIV. 조직시민행동(OCB)의 구성요소 및 유발 방안\nV. 요약 및 결론",
-    keys: ["메이어&앨런", "정서적 몰입", "유지적 몰입", "규범적 몰입", "조직시민행동(OCB)", "이직 의도", "직무만족"]
-  },
-
-  // --- 노사관계론 (노동법/노사관계) ---
-  {
-    h: "노사관계론 > 노사관계일반 > 노사관계시스템",
-    q: "던롭(Dunlop)의 노사관계 시스템 이론을 설명하고, 현대 노사관계의 3자 모델(사용자, 노동자, 정부)과 외부 환경 변수의 상호작용에 대해 논하시오. (30점)",
-    struct: "I. 노사관계 시스템의 의의\nII. 던롭 모델의 4요소 (주체, 환경, 이데올로기, 규칙)\nIII. 기술, 시장, 권력구조 등 환경적 제약 조건\nIV. 시스템 이론의 한계와 현대적 확장\nV. 한국적 노사관계 시스템에의 시사점",
-    keys: ["던롭(Dunlop)", "기술적 특성", "시장적 제약", "권력체계", "이데올로기", "웹 가(Webbs)", "규칙의 네트워크"]
-  },
-  {
-    h: "노사관계론 > 단체교섭 > 교섭전략",
-    q: "배러와 월튼(Walton & McKersie)의 교섭 유형 4가지를 설명하고, 대립적 교섭에서 상생적 교섭(분배적 vs 통합적)으로의 전환을 위한 전제 조건을 논하시오. (30점)",
-    struct: "I. 단체교섭의 본질\nII. 4가지 교섭 유형 (분배적, 통합적, 태도형성, 조직내 교섭)\nIII. 분배적 교섭과 통합적 교섭의 주요 차이점 비교\nIV. 신뢰 구축 및 정보 공유 등 통합적 교섭 활성화 방안\nV. 결론",
-    keys: ["월튼&맥커시", "분배적 교섭", "통합적 교섭", "제로섬(Zero-sum)", "윈윈(Win-win)", "조직내 교섭", "태도형성"]
-  },
-  {
-    h: "노사관계론 > 노동법 > 부당노동행위",
-    q: "우리나라 부당노동행위 제도의 목적과 유형 5가지를 기술하고, 특히 '지배·개입' 행위의 판단 기준과 구제 절차에 관하여 논하시오. (30점)",
-    struct: "I. 부당노동행위제도의 목적 (노동3권 보호)\nII. 5가지 유형 (불이익취급, 황견계약, 단체교섭 거부, 지배개입, 보복행위)\nIII. 지배·개입의 성립 요건과 사용자 언론의 자유 한계\nIV. 노동위원회를 통한 행정적 구제 절차\nV. 실효성 확보 방안",
-    keys: ["지배·개입", "불이익취급", "황견계약", "노동위원회", "구제명령", "반조합 의사", "사용자 언론의 자유"]
-  },
-  {
-    h: "노사관계론 > 경영참가 > 근로자참가제도",
-    q: "근로자 경영참가제도의 3대 유형(자본참가, 이익참가, 의사결정참가)을 설명하고, 노사협의회 제도와의 차이점 및 발전 방향을 논하시오. (30점)",
-    struct: "I. 경영참가의 의의 및 필요성\nII. 유형별 특징 (종업원지주제, 이익분배제, 노사공동결정제)\nIII. 단체교섭과 노사협의회의 관계 및 비교\nIV. 한국 노사협의회법의 주요 내용과 한계\nV. 생산적 노사관계를 위한 제언",
-    keys: ["자본참가", "이익분배제(PS)", "성과배분제(Gain-sharing)", "노사협의회", "공동결정제", "경영권", "산업민주주의"]
-  },
-  {
-    h: "노사관계론 > 노동법 > 단체행동권",
-    q: "노동쟁의 및 쟁의행위의 정당성 요건(주체, 목적, 시기, 수단)을 설명하고, 대체근로 금지 규정과 관련한 최근 논의를 논하시오. (30점)",
-    struct: "I. 단체행동권의 헌법적 의의\nII. 쟁의행위 정당성의 4대 요건\nIII. 목적의 정당성 (근로조건 유지 개선 vs 경영권 사항)\nIV. 대체근로 제한 규정의 취지와 사용자 대항권(직장폐쇄)\nV. 결론 및 최근 법 개정 동향",
-    keys: ["쟁의행위", "정당성 요건", "평화의무", "대체근로 금지", "직장폐쇄", "노동쟁의", "최후수단의 원칙"]
-  }
-];
-
-        const item = quizData[Math.floor(Math.random() * quizData.length)];
-        document.getElementById('disp-hierarchy').innerText = item.h;
-        document.getElementById('disp-q').innerText = item.q;
-
-        function showResult() {
-            document.getElementById('ans-area').style.display = 'block';
-            document.getElementById('std-struct').innerText = item.struct;
-            document.getElementById('std-key').innerHTML = item.keys.map(k => `<span class="tag">${k}</span>`).join('');
-            window.scrollTo(0, document.body.scrollHeight);
+<script>
+    const quizData = [
+        {
+            h: "조직행동론 > 개인차원 > 동기부여론",
+            q: "브룸(Vroom)의 기대이론과 아담스(Adams)의 공정성이론을 비교 논하시오. (30점)",
+            // Depth가 깊어진 구조 예시
+            struct: "I. 서론: 동기부여 과정이론의 의의\n\nII. 브룸(Vroom)의 기대이론\n  1. 기대이론의 기본 가정\n  2. 핵심 변수 (V-I-E)\n    (1) 유의성(Valence): 보상의 매력도\n    (2) 수단성(Instrumentality): 성과와 보상의 연결고리\n    (3) 기대감(Expectancy): 노력과 성과의 확률적 믿음\n  3. 동기부여 강도 산식 (M = V x I x E)\n\nIII. 아담스(Adams)의 공정성이론\n  1. 이론적 기초: 사회적 비교이론\n  2. 공정성 판단의 메커니즘\n    (1) 투입(Input)과 결과(Outcome)\n    (2) 준거인물(Comparison Other)의 선정\n  3. 불공정성 지각 시 조절 행동\n    (1) 투입/결과 변경, 준거인물 변경, 조직 이탈 등\n\nIV. 두 이론의 비교 및 조직관리 시사점\n\nV. 결론",
+            keys: ["V-I-E 모형", "보상의 유의성", "성과-보상 기대", "사회적 비교", "준거인물", "분배적 공정성", "인지적 왜곡", "투입 변경", "심리적 불균형 해소"]
         }
-    </script>
-</body>
-</html>
+    ];
+    // ... 나머지 실행 로직은 동일
+</script>
