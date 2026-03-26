@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경지사 2차 암기 마스터</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f9; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .q-text { font-size: 1.1rem; font-weight: bold; color: #1a73e8; margin-bottom: 15px; }
+        textarea { width: 100%; height: 80px; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .result { display: none; background: #e8f0fe; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem; }
+        .tag { display: inline-block; background: #34a853; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin: 2px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div id="q-area" class="q-text">문제를 불러오는 중...</div>
+        <p>1. 목차를 잡아보세요 (I, II, III...)</p>
+        <textarea id="ans-struct"></textarea>
+        <p>2. 핵심 키워드를 나열해보세요</p>
+        <textarea id="ans-key"></textarea>
+        <button class="btn" onclick="showAns()">정답 확인</button>
+        
+        <div id="res-area" class="result">
+            <strong>✅ 표준 목차:</strong> <p id="std-struct"></p>
+            <strong>✅ 필수 키워드:</strong> <div id="std-key"></div>
+            <br>
+            <button class="btn" style="background:#5f6368" onclick="location.reload()">다음 문제 (무작위)</button>
+        </div>
+    </div>
+
+    <script>
+        // 여기에 AI가 뽑아준 데이터를 넣을 예정입니다.
+        const quizData = [
+            { q: "인적자원관리의 현대적 추세에 대해 논하시오.", struct: "I. 의의, II. 전략적 HRM, III. 유연성 관리, IV. 결론", keys: ["전략적 정렬", "직무 유연성", "성과 중심"] }
+        ];
+
+        const item = quizData[Math.floor(Math.random() * quizData.length)];
+        document.getElementById('q-area').innerText = "Q. " + item.q;
+
+        function showAns() {
+            document.getElementById('res-area').style.display = 'block';
+            document.getElementById('std-struct').innerText = item.struct;
+            document.getElementById('std-key').innerHTML = item.keys.map(k => `<span class="tag">${k}</span>`).join('');
+        }
+    </script>
+</body>
+</html>
